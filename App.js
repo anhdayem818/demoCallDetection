@@ -2,6 +2,9 @@
 import React, {useState, useEffect   } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, PermissionsAndroid } from 'react-native';
 import CallDetectorManager from "react-native-call-detection";
+import { WebView } from 'react-native-webview';
+
+import axios from 'axios';
 
 const App = () => {
   
@@ -13,6 +16,7 @@ const App = () => {
     setFeatureOn(true)
     const callDetector= new CallDetectorManager( (event, number ) => {
       console.log(event)
+      console.log(number)
       if (event === 'Disconnected') {
         // Do something call got disconnected
         }
@@ -35,6 +39,7 @@ const App = () => {
         // This clause will only be executed for Android
         }
         else if (event === 'Missed') {
+          sendTriggerMissingCallToServer(number)
             // Do something call got missed
             // This clause will only be executed for Android
         }
@@ -66,21 +71,39 @@ const App = () => {
     }
    };
 
+  const sendTriggerMissingCallToServer = (phone_number)=>{
+    const res = axios.post('https://webmely.com/api/v2/event_store/income',  
+        {
+          access_token: '7de0acffbfbf3a4b4b12ea426e31e03f',
+          event_name: 'missed-call',
+          payload: {
+            phone_number: phone_number,
+          }
+        }
+      );
+
+  }
   useEffect(() => {
     askPermission();
-
+    startListener()
   }, [])
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.text}> hello</Text>
-      <TouchableOpacity
-        onPress={ featureOn ? stopListener : startListener }
-        style={styles.btnStyle}
-      >
-        <Text> { featureOn ? "Disable" :"Enable" } </Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+    // <SafeAreaView style={styles.container}>
+    //   <Text style={styles.text}> hello</Text>
+    //   <TouchableOpacity
+    //     onPress={ featureOn ? stopListener : startListener }
+    //     style={styles.btnStyle}
+    //   >
+    //     <Text> { featureOn ? "Disable" :"Enable" } </Text>
+    //   </TouchableOpacity>
+    // </SafeAreaView>
+    <WebView
+      source={{
+        uri: 'https://hopgiaysi.com/admin'
+      }}
+      style={{ marginTop: 20 }}
+    />
   );
 };
 
