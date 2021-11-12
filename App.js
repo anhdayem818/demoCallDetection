@@ -3,11 +3,18 @@ import React, {useState, useEffect   } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, PermissionsAndroid } from 'react-native';
 import CallDetectorManager from "react-native-call-detection";
 import { WebView } from 'react-native-webview';
-
+import ReactNativeForegroundService from '@supersami/rn-foreground-service';
 import axios from 'axios';
 
 const App = () => {
   
+  ReactNativeForegroundService.add_task(() => console.log('I am Being Tested'), {
+    delay: 100,
+    onLoop: true,
+    taskId: 144,
+    onError: (e) => console.log(`Error logging:`, e),
+  });
+
   const [featureOn, setFeatureOn] = useState(false)
   const [incoming, setIncoming] = useState(false)
   const [number, setNumber] = useState(null)
@@ -85,7 +92,13 @@ const App = () => {
   }
   useEffect(() => {
     askPermission();
-    startListener()
+    startListener();
+    ReactNativeForegroundService.start({
+      id: 144,
+      title: 'Foreground Service',
+      message: 'you are online!',
+    });
+
   }, [])
 
   return (
